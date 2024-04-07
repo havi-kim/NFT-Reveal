@@ -6,8 +6,8 @@ import "forge-std/Test.sol";
 import {Config} from "src/objects/Config.sol";
 import {RevealType} from "src/types/GlobalEnum.sol";
 
-// This is a test code wrapper for forge coverage issue(forge coverage miss library).
-contract TestWrapper {
+// This is a test code wrapper for forge coverage issue(forge coverage miss library test codes).
+contract WConfigUnitTest {
     ConfigUnitTest private testTarget;
 
     function setUp() public {
