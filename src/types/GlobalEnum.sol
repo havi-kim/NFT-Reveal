@@ -5,8 +5,3 @@ enum RevealType {
     InCollection,
     SeparateCollection
 }
-
-enum RevealStatus {
-    NOT_REVEALED,
-    REVEALED
-}

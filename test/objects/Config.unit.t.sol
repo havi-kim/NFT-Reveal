@@ -19,7 +19,7 @@ contract WConfigUnitTest {
         testTarget.$test_init();
     }
 
-    // @fail_test 
+    // @fail_test
     function test_init_fail() external {
         testTarget.$test_init_fail_0();
         testTarget.$test_init_fail_1();
@@ -27,11 +27,12 @@ contract WConfigUnitTest {
         testTarget.$test_init_fail_3();
     }
     // @succes_test
+
     function test_setMintingPrice() external {
         testTarget.$test_setMintingPrice();
     }
 
-    // @fail_test 
+    // @fail_test
     function test_setMintingPrice_fail() external {
         testTarget.$test_setMintingPrice_fail_0();
     }
@@ -41,7 +42,7 @@ contract WConfigUnitTest {
         testTarget.$test_setMintStartBlock();
     }
 
-    // @fail_test 
+    // @fail_test
     function test_setMintStartBlock_fail() external {
         testTarget.$test_setMintStartBlock_fail_0();
         testTarget.$test_setMintStartBlock_fail_1();

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {RevealType} from "../types/GlobalEnum.sol";
 
 library Config {
-    bytes32 private constant _CONFIG_STORAGE = keccak256("src.objects.Config.storage.v0.0.1");
+    bytes32 private constant _CONFIG_STORAGE = keccak256("src.objects.Config.storage.v1");
 
     // NFT mint & reveal configuration. Using 1 slot.
     struct ConfigStorage {

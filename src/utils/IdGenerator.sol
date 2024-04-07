@@ -55,7 +55,6 @@ library IdGenerator {
         return readByKey(_seed).lastId;
     }
 
-
     /**
      * @dev Read the storage slot of the IdGenerator. If change visibility of this function to internal, encapsulation will break.
      * @return data The storage slot.

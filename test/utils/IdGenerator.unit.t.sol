@@ -3,7 +3,7 @@ pragma solidity >=0.8.11 <0.9.0;
 
 import "forge-std/Test.sol";
 
-import { IdGenerator, IdSeed } from "src/utils/IdGenerator.sol";
+import {IdGenerator, IdSeed} from "src/utils/IdGenerator.sol";
 
 // This is a test code wrapper for forge coverage issue.
 contract WIdGeneratorUnitTest {
@@ -34,7 +34,7 @@ contract IdGeneratorUnitTest is Test {
 
         // Assert
         assertEq(id2, IdGenerator.getLastSharedId(), "Last shared id should be equal to the last generated id");
-        assertEq(id + 1, id2, 'Generated id should be incremental');
+        assertEq(id + 1, id2, "Generated id should be incremental");
     }
 
     // @success_test
@@ -62,6 +62,6 @@ contract IdGeneratorUnitTest is Test {
         // Assert
         assertEq(id, IdGenerator.getLastUniqueId(key), "Last unique id should be equal to the last generated id");
         assertEq(id2, IdGenerator.getLastUniqueId(key2), "Last unique id should be equal to the last generated id");
-        assertEq(id, id2, 'Generated id should be not shared between different keys');
+        assertEq(id, id2, "Generated id should be not shared between different keys");
     }
 }
