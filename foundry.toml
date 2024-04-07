@@ -7,8 +7,11 @@ build_info = true
 libs = ["lib"]
 evm_version = "cancun"
 remappings = [
-    '@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/',
-    '@openzeppelin/contracts-upgradeable-4.7.3/=lib/openzeppelin-contracts-upgradeable/contracts/'
+    '@openzeppelin-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/',
+    '@openzeppelin/contracts-upgradeable-4.7.3/=lib/openzeppelin-contracts-upgradeable/contracts/',
+    '@openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/',
+    '@chainlink/=lib/foundry-chainlink-toolkit/src',
+    '@chainlink-contracts/=lib/foundry-chainlink-toolkit/lib/chainlink-brownie-contracts/contracts/src/v0.8/'
 ]
 
 [fmt]
