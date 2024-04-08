@@ -14,18 +14,20 @@ import {Call} from "src/utils/Call.sol";
 import {Metadata} from "src/objects/Metadata.sol";
 
 contract RevealedNFT is IRevealedNFT, ERC721Upgradeable, OwnableUpgradeable {
-    IdSeed private constant _ID_GENERATOR = IdSeed.wrap(keccak256("src.NFT.v1"));
+    //--------------------------------------------------------------------------------------
+    //--------------------------------- CONSTANT & STATE  ----------------------------------
+    //--------------------------------------------------------------------------------------
 
+    // The address of the parent NFT contract
     address private immutable _PARENT_NFT;
-
-    modifier onlyParent() {
-        require(msg.sender == _PARENT_NFT, "RevealedNFT: Only parent NFT contract can call");
-        _;
-    }
 
     constructor() {
         _PARENT_NFT = msg.sender;
     }
+
+    //--------------------------------------------------------------------------------------
+    //----------------------------  STATE-CHANGING FUNCTIONS  ------------------------------
+    //--------------------------------------------------------------------------------------
 
     /**
      * @dev Initialize the contract.
@@ -46,11 +48,24 @@ contract RevealedNFT is IRevealedNFT, ERC721Upgradeable, OwnableUpgradeable {
         Metadata.setMetadata(tokenId_, metadata_);
     }
 
+    //--------------------------------------------------------------------------------------
+    //--------------------------------------  GETTER  --------------------------------------
+    //--------------------------------------------------------------------------------------
+
     /**
      * @dev Get the token URI.
      * @return The token URI.
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         return Metadata.getMetadata(tokenId);
+    }
+
+    //--------------------------------------------------------------------------------------
+    //------------------------------------  MODIFIERS  -------------------------------------
+    //--------------------------------------------------------------------------------------
+
+    modifier onlyParent() {
+        require(msg.sender == _PARENT_NFT, "RevealedNFT: Only parent NFT contract can call");
+        _;
     }
 }

@@ -18,8 +18,23 @@ import {RevealType} from "src/types/GlobalEnum.sol";
 import {Metadata} from "src/objects/Metadata.sol";
 import {SeparateCollection} from "src/objects/SeparateCollection.sol";
 
-contract NFT is UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable, VRFConsumerBaseV2Upgradeable, UsingReentrancyLock {
+contract NFT is
+    UUPSUpgradeable,
+    ERC721Upgradeable,
+    OwnableUpgradeable,
+    VRFConsumerBaseV2Upgradeable,
+    UsingReentrancyLock
+{
+    //--------------------------------------------------------------------------------------
+    //------------------------------------  CONSTANT  --------------------------------------
+    //--------------------------------------------------------------------------------------
+
+    // The key of the ID generator
     IdSeed private constant _ID_GENERATOR = IdSeed.wrap(keccak256("src.NFT.v1"));
+
+    //--------------------------------------------------------------------------------------
+    //----------------------------  STATE-CHANGING FUNCTIONS  ------------------------------
+    //--------------------------------------------------------------------------------------
 
     /**
      * @dev Initialize the contract.
@@ -35,7 +50,7 @@ contract NFT is UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable, VRFConsu
         uint48 mintStartBlock_,
         RevealType revealType_,
         uint48 revealStartBlock_
-    ) public initializer {
+    ) external initializer {
         __ERC721_init(name_, symbol_);
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
@@ -82,7 +97,7 @@ contract NFT is UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable, VRFConsu
     /**
      * @dev Reveal a NFT. The reveal is only possible after the reveal has started.
      */
-    function reveal(uint256 tokenId_) public nonReentrant returns (uint256 requestId) {
+    function reveal(uint256 tokenId_) external nonReentrant returns (uint256 requestId) {
         // 0. Check if reveal possible
         {
             if (!Config.isRevealStarted()) {
@@ -108,6 +123,65 @@ contract NFT is UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable, VRFConsu
         Call.pay(msg.sender, amount_);
     }
 
+    //--------------------------------------------------------------------------------------
+    //--------------------------------------  SETTER  --------------------------------------
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * @dev Set the mint price.
+     * @param price_ The mint price.
+     */
+    function setMintPrice(uint96 price_) external onlyOwner {
+        Config.setMintPrice(price_);
+    }
+
+    /**
+     * @dev Set the mint start block.
+     * @param startBlock_ The mint start block.
+     */
+    function setMintStartBlock(uint48 startBlock_) external onlyOwner {
+        Config.setMintStartBlock(startBlock_);
+    }
+
+    /**
+     * @dev Set the reveal type.
+     * @param revealType_ The reveal type.
+     */
+    function setRevealType(RevealType revealType_) external onlyOwner {
+        Config.setRevealType(revealType_);
+    }
+
+    /**
+     * @dev Set the reveal start block.
+     * @param startBlock_ The reveal start block.
+     */
+    function setRevealStartBlock(uint48 startBlock_) external onlyOwner {
+        Config.setRevealStartBlock(startBlock_);
+    }
+
+    //--------------------------------------------------------------------------------------
+    //--------------------------------------  GETTER  --------------------------------------
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * @dev Get Config.
+     */
+    function config() external view returns (Config.ConfigStorage memory) {
+        return Config.copy();
+    }
+
+    /**
+     * @dev Get the token URI.
+     * @return The token URI.
+     */
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        return Metadata.getMetadata(tokenId);
+    }
+
+    //--------------------------------------------------------------------------------------
+    //-------------------------------  INTERNAL FUNCTIONS   --------------------------------
+    //--------------------------------------------------------------------------------------
+
     /**
      * @dev Callback function used by VRF Coordinator.
      * @param requestId_ The request ID.
@@ -130,14 +204,6 @@ contract NFT is UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable, VRFConsu
                 revert("fulfillRandomWords: Invalid reveal type");
             }
         }
-    }
-
-    /**
-     * @dev Get the token URI.
-     * @return The token URI.
-     */
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        return Metadata.getMetadata(tokenId);
     }
 
     /**

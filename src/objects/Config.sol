@@ -23,7 +23,9 @@ library Config {
      * @param revealType_ The reveal type.
      * @param revealStartBlock_ The reveal start block.
      */
-    function init(uint96 mintPrice_, uint48 mintStartBlock_, RevealType revealType_, uint48 revealStartBlock_) internal {
+    function init(uint96 mintPrice_, uint48 mintStartBlock_, RevealType revealType_, uint48 revealStartBlock_)
+        internal
+    {
         ConfigStorage storage data = read();
 
         // 0. Check the validity of the parameters
@@ -171,6 +173,13 @@ library Config {
      */
     function getRevealType() internal view returns (RevealType) {
         return read().revealType;
+    }
+
+    /**
+     * @dev Copy the Config to memory. Only for view functions.
+     */
+    function copy() internal view returns (ConfigStorage memory) {
+        return read();
     }
 
     /**

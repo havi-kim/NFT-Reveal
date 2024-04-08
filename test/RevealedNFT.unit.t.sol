@@ -16,8 +16,8 @@ contract RevealedNFTUnitTest is Test {
     function test_mint() external {
         // Arrange
         address to = address(0x1);
-        uint tokenId = 2;
-        uint metadata = uint(0x300020001000a001400);
+        uint256 tokenId = 2;
+        uint256 metadata = uint256(0x300020001000a001400);
         testTarget.initialize("TEST_NAME", "TEST_SYMBOL", address(0x2));
 
         // Act
@@ -26,15 +26,18 @@ contract RevealedNFTUnitTest is Test {
         // Assert
         string memory result = testTarget.tokenURI(tokenId);
         assertEq(testTarget.ownerOf(tokenId), to, "Minted token is not owned by the correct address");
-        assertEq(result, '{"name": "The revealed NFT-2", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}');
+        assertEq(
+            result,
+            '{"name": "The revealed NFT-2", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}'
+        );
     }
 
     // @fail_test Case: Call from other account
     function test_mint_fail_from_other() external {
         // Arrange
         address to = address(0x1);
-        uint tokenId = 2;
-        uint metadata = uint(0x300020001000a001400);
+        uint256 tokenId = 2;
+        uint256 metadata = uint256(0x300020001000a001400);
         RevealedNFT revealedNFT = new RevealedNFT();
         revealedNFT.initialize("TEST_NAME", "TEST_SYMBOL", address(0x2));
 

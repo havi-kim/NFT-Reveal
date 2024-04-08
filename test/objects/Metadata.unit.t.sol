@@ -41,7 +41,10 @@ contract MetadataUnitTest is Test {
 
         // Assert
         string memory result = Metadata.getMetadata(tokenId);
-        assertEq(result, '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}');
+        assertEq(
+            result,
+            '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}'
+        );
     }
 
     // @fail_test

@@ -13,15 +13,23 @@ contract NFTUnitTest is Test {
 
     function setUp() public {
         testTarget = new NFT();
-        testTarget.initialize("TEST_NAME", "TEST_SYMBOL", mockCoordinator, mintPrice, uint48(block.number + 1), RevealType.InCollection, uint48(block.number + 10));
+        testTarget.initialize(
+            "TEST_NAME",
+            "TEST_SYMBOL",
+            mockCoordinator,
+            mintPrice,
+            uint48(block.number + 1),
+            RevealType.InCollection,
+            uint48(block.number + 10)
+        );
     }
 
     // @success_test
     function test_mint() external {
         // Arrange
         vm.roll(block.number + 1);
-        uint balanceOfThis = address(this).balance;
-        uint balanceOfTarget = address(testTarget).balance;
+        uint256 balanceOfThis = address(this).balance;
+        uint256 balanceOfTarget = address(testTarget).balance;
 
         // Act
         uint256 tokenId = testTarget.mint{value: mintPrice}();
@@ -36,8 +44,8 @@ contract NFTUnitTest is Test {
     function test_mint_pay_over() external {
         // Arrange
         vm.roll(block.number + 1);
-        uint balanceOfThis = address(this).balance;
-        uint balanceOfTarget = address(testTarget).balance;
+        uint256 balanceOfThis = address(this).balance;
+        uint256 balanceOfTarget = address(testTarget).balance;
 
         // Act
         uint256 tokenId = testTarget.mint{value: mintPrice + 1e18}();
@@ -80,12 +88,16 @@ contract NFTUnitTest is Test {
         // Arrange
         uint256 requestId = 5;
         vm.roll(block.number + 1);
-        uint tokenId = testTarget.mint{value: mintPrice}();
+        uint256 tokenId = testTarget.mint{value: mintPrice}();
 
         vm.roll(block.number + 10);
 
         // Act
-        vm.mockCall(mockCoordinator, abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector), abi.encode(requestId));
+        vm.mockCall(
+            mockCoordinator,
+            abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector),
+            abi.encode(requestId)
+        );
         uint256 returnId = testTarget.reveal(tokenId);
 
         // Assert
@@ -97,11 +109,15 @@ contract NFTUnitTest is Test {
         // Arrange
         uint256 requestId = 5;
         vm.roll(block.number + 1);
-        uint tokenId = testTarget.mint{value: mintPrice}();
+        uint256 tokenId = testTarget.mint{value: mintPrice}();
 
         // Act
         vm.expectRevert("reveal: Reveal has not started yet");
-        vm.mockCall(mockCoordinator, abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector), abi.encode(requestId));
+        vm.mockCall(
+            mockCoordinator,
+            abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector),
+            abi.encode(requestId)
+        );
         testTarget.reveal(tokenId);
     }
 
@@ -110,16 +126,18 @@ contract NFTUnitTest is Test {
         // Arrange
         vm.roll(block.number + 1);
         uint256 tokenId = testTarget.mint{value: mintPrice}();
-        uint balanceOfThis = address(this).balance;
-        uint balanceOfTarget = address(testTarget).balance;
-        uint testAmount = 0.001e18;
+        uint256 balanceOfThis = address(this).balance;
+        uint256 balanceOfTarget = address(testTarget).balance;
+        uint256 testAmount = 0.001e18;
 
         // Act
         testTarget.withdraw(testAmount);
 
         // Assert
         assertEq(address(this).balance, balanceOfThis + testAmount, "The balance of this address is not increased");
-        assertEq(address(testTarget).balance, balanceOfTarget - testAmount, "The balance of target address is not decreased");
+        assertEq(
+            address(testTarget).balance, balanceOfTarget - testAmount, "The balance of target address is not decreased"
+        );
     }
 
     // @success_test
@@ -127,9 +145,9 @@ contract NFTUnitTest is Test {
         // Arrange
         vm.roll(block.number + 1);
         uint256 tokenId = testTarget.mint{value: mintPrice}();
-        uint balanceOfThis = address(this).balance;
-        uint balanceOfTarget = address(testTarget).balance;
-        uint testAmount = balanceOfTarget + 0.001e18;
+        uint256 balanceOfThis = address(this).balance;
+        uint256 balanceOfTarget = address(testTarget).balance;
+        uint256 testAmount = balanceOfTarget + 0.001e18;
 
         // Act
         testTarget.withdraw(testAmount);
@@ -137,6 +155,19 @@ contract NFTUnitTest is Test {
         // Assert
         assertEq(address(this).balance, balanceOfThis + balanceOfTarget, "The balance of this address is not increased");
         assertEq(address(testTarget).balance, 0, "The balance of target is invalid");
+    }
+
+    // @fail_test Case: Not owner
+    function test_withdraw_fail_not_owner() external {
+        // Arrange
+        vm.roll(block.number + 1);
+        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        uint256 testAmount = 0.001e18;
+
+        // Act
+        vm.broadcast(address(0x1));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(0x1)));
+        testTarget.withdraw(testAmount);
     }
 
     receive() external payable {}

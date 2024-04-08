@@ -24,9 +24,9 @@ contract CallUnitTest is Test {
     function $test_pay() external payable {
         // Arrange
         address target = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
-        uint balanceOfThis = address(this).balance;
-        uint balanceOfTarget = address(target).balance;
-        uint value = 1e18;
+        uint256 balanceOfThis = address(this).balance;
+        uint256 balanceOfTarget = address(target).balance;
+        uint256 value = 1e18;
 
         // Act
         Call.pay(target, value);
