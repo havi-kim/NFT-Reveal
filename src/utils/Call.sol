@@ -44,6 +44,12 @@ library Call {
      */
     function pay(address _target, uint256 _value) internal {
         (bool success,) = _target.call{value: _value}("");
-        require(success, "Call: failed to pay");
+        if (!success) {
+            assembly {
+                let ptr := mload(0x40)
+                returndatacopy(ptr, 0, returndatasize())
+                revert(ptr, returndatasize())
+            }
+        }
     }
 }

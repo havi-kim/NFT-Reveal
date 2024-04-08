@@ -9,7 +9,7 @@ library ReentrancyLock {
     bytes32 private constant _REENTRANCY_LOCK_STORAGE = keccak256("src.utils.ReentrancyLock.storage");
 
     /*
-     * @dev It defends against reentrancy attacks & batch minting using contract.
+     * @dev It defends against reentrancy attacks.
      */
     function lock() internal {
         bytes32 key = _REENTRANCY_LOCK_STORAGE;
@@ -23,6 +23,16 @@ library ReentrancyLock {
         }
     }
 
+    /*
+     * @dev It unlocks the reentrancy.
+     */
+    function unlock() internal {
+        bytes32 key = _REENTRANCY_LOCK_STORAGE;
+        assembly {
+            tstore(key, false)
+        }
+    }
+
     /**
      * @dev Check if the reentrancy is locked.
      * @return lockFlag True if the reentrancy is locked.
@@ -32,5 +42,17 @@ library ReentrancyLock {
         assembly {
             lockFlag := tload(key)
         }
+    }
+}
+
+/**
+ * @title UsingReentrancyLock
+ * @dev The UsingReentrancyLock contract provides modifier to prevent reentrancy.
+ */
+contract UsingReentrancyLock {
+    modifier nonReentrant() {
+        ReentrancyLock.lock();
+        _;
+        ReentrancyLock.unlock();
     }
 }
