@@ -36,9 +36,10 @@ library SeparateCollection {
      * @dev Mint a revealed NFT.
      * @param to_ The address of the receiver.
      * @param tokenId_ The token ID.
+     * @param metadata_ The metadata of the NFT.
      */
-    function mint(address to_, uint256 tokenId_) internal {
-        IRevealedNFT(read().revealContract).mint(to_, tokenId_);
+    function mint(address to_, uint256 tokenId_, uint256 metadata_) internal {
+        IRevealedNFT(read().revealContract).mint(to_, tokenId_, metadata_);
     }
 
     /**

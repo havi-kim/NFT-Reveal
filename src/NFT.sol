@@ -125,7 +125,7 @@ contract NFT is UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable, VRFConsu
             if (revealType == RevealType.InCollection) {
                 Metadata.setMetadata(tokenId, randomWords_[0]);
             } else if (revealType == RevealType.SeparateCollection) {
-                SeparateCollection.mint(to, tokenId);
+                SeparateCollection.mint(to, tokenId, randomWords_[0]);
             } else {
                 revert("fulfillRandomWords: Invalid reveal type");
             }

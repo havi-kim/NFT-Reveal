@@ -11,19 +11,20 @@ import {ReentrancyLock} from "src/utils/ReentrancyLock.sol";
 import {IdSeed} from "src/utils/IdGenerator.sol";
 import {Config} from "src/objects/Config.sol";
 import {Call} from "src/utils/Call.sol";
+import {Metadata} from "src/objects/Metadata.sol";
 
 contract RevealedNFT is IRevealedNFT, ERC721Upgradeable, OwnableUpgradeable {
     IdSeed private constant _ID_GENERATOR = IdSeed.wrap(keccak256("src.NFT.v1"));
 
-    address private immutable _ORIGINAL_NFT;
+    address private immutable _PARENT_NFT;
 
-    modifier onlyOriginalNFT() {
-        require(msg.sender == _ORIGINAL_NFT, "RevealedNFT: Only original NFT contract can call");
+    modifier onlyParent() {
+        require(msg.sender == _PARENT_NFT, "RevealedNFT: Only parent NFT contract can call");
         _;
     }
 
     constructor() {
-        _ORIGINAL_NFT = msg.sender;
+        _PARENT_NFT = msg.sender;
     }
 
     /**
@@ -40,7 +41,16 @@ contract RevealedNFT is IRevealedNFT, ERC721Upgradeable, OwnableUpgradeable {
     /**
      * @dev Mint a NFT.
      */
-    function mint(address to_, uint256 tokenId_) external override onlyOriginalNFT {
+    function mint(address to_, uint256 tokenId_, uint256 metadata_) external override onlyParent {
         _mint(to_, tokenId_);
+        Metadata.setMetadata(tokenId_, metadata_);
+    }
+
+    /**
+     * @dev Get the token URI.
+     * @return The token URI.
+     */
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        return Metadata.getMetadata(tokenId);
     }
 }
