@@ -27,6 +27,11 @@ contract WRevealUnitTest {
     function test_endReveal() external {
         testTarget.$test_endReveal();
     }
+
+    // @fail_test
+    function test_endReveal_fail() external {
+        testTarget.$test_endReveal_fail_not_in_progress();
+    }
 }
 
 contract RevealUnitTest is Test {
