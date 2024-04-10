@@ -12,7 +12,7 @@ import {ReentrancyLock, UsingReentrancyLock} from "src/utils/ReentrancyLock.sol"
 import {IdSeed} from "src/utils/IdGenerator.sol";
 import {Config} from "src/objects/Config.sol";
 import {Call} from "src/utils/Call.sol";
-import {ChainlinkVRF} from "src/utils/ChainlinkVRF.sol";
+import {ChainlinkVRFSepolia} from "src/utils/ChainlinkVRFSepolia.sol";
 import {Reveal} from "src/objects/Reveal.sol";
 import {RevealType} from "src/types/GlobalEnum.sol";
 import {Metadata} from "src/objects/Metadata.sol";
@@ -107,9 +107,24 @@ contract NFT is
 
         // 1. Request a random number & start the reveal
         {
-            requestId = ChainlinkVRF.request(1);
+            requestId = ChainlinkVRFSepolia.request(1);
             Reveal.startReveal(tokenId_, requestId);
         }
+    }
+
+    //--------------------------------------------------------------------------------------
+    //---------------------------------  ADMIN FUNCTIONS  ---------------------------------
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * @dev Create the revealed NFT contract. Only available in SeparateCollection config.
+     */
+    function createRevealedNFT() external onlyOwner returns (address) {
+        if (Config.getRevealType() != RevealType.SeparateCollection) {
+            revert("createRevealedNFT: Only available in SeparateCollection config");
+        }
+        SeparateCollection.createRevealedNFT(name(), symbol(), owner());
+        return address(SeparateCollection.getRevealedNFT());
     }
 
     /**
@@ -122,10 +137,6 @@ contract NFT is
         }
         Call.pay(msg.sender, amount_);
     }
-
-    //--------------------------------------------------------------------------------------
-    //--------------------------------------  SETTER  --------------------------------------
-    //--------------------------------------------------------------------------------------
 
     /**
      * @dev Set the mint price.
@@ -178,6 +189,14 @@ contract NFT is
         return Metadata.getMetadata(tokenId);
     }
 
+    /**
+     * @dev Get the revealed NFT address.
+     * @return The revealed NFT address.
+     */
+    function revealedNFT() external view returns (address) {
+        return address(SeparateCollection.getRevealedNFT());
+    }
+
     //--------------------------------------------------------------------------------------
     //-------------------------------  INTERNAL FUNCTIONS   --------------------------------
     //--------------------------------------------------------------------------------------
@@ -194,16 +213,23 @@ contract NFT is
         // 1. Get the reveal type
         RevealType revealType = Config.getRevealType();
 
-        // 2. Mint the revealed NFT
-        {
-            if (revealType == RevealType.InCollection) {
-                Metadata.setMetadata(tokenId, randomWords_[0]);
-            } else if (revealType == RevealType.SeparateCollection) {
-                SeparateCollection.mint(to, tokenId, randomWords_[0]);
-            } else {
-                revert("fulfillRandomWords: Invalid reveal type");
-            }
+        // 2. If the reveal type is InCollection, set the metadata
+        if (revealType == RevealType.InCollection) {
+            Metadata.setMetadata(tokenId, randomWords_[0]);
+            return;
         }
+
+        // 3. If the reveal type is SeparateCollection, mint the revealed NFT
+        if (revealType == RevealType.SeparateCollection) {
+            if (!SeparateCollection.isRevealedNFTCreated()) {
+                SeparateCollection.createRevealedNFT(name(), symbol(), owner());
+            }
+            SeparateCollection.mint(to, tokenId, randomWords_[0]);
+            return;
+        }
+
+        // 4. If the reveal type is not supported, revert
+        revert("fulfillRandomWords: Invalid reveal type");
     }
 
     /**

@@ -73,9 +73,7 @@ contract RevealUnitTest is Test {
         // Assert
         assertTrue(to == msg.sender, "The address of the receiver is not correct");
         assertTrue(queriedTokenId == tokenId, "The token ID is not correct");
-        assertTrue(
-            Reveal.getRevealStatus(tokenId) == Reveal.RevealStatus.REVEALED, "The reveal status is not revealed"
-        );
+        assertTrue(Reveal.getRevealStatus(tokenId) == Reveal.RevealStatus.REVEALED, "The reveal status is not revealed");
     }
 
     // @fail_test Case: the reveal process is not in progress

@@ -4,7 +4,8 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import {VRFCoordinatorV2Interface} from "@chainlink/interfaces/vrf/VRFCoordinatorV2Interface.sol";
 
-import "../src/NFT.sol";
+import "src/NFT.sol";
+import "src/RevealedNFT.sol";
 
 contract NFTUnitTest is Test {
     NFT private testTarget;
@@ -113,12 +114,111 @@ contract NFTUnitTest is Test {
 
         // Act
         vm.expectRevert("reveal: Reveal has not started yet");
+        testTarget.reveal(tokenId);
+    }
+
+    // @success_test Case: InCollection
+    function test_fulfillRandomWords_InCollection() external {
+        // Arrange
+        vm.roll(block.number + 1);
+        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        uint256 requestId = 5;
         vm.mockCall(
             mockCoordinator,
             abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector),
             abi.encode(requestId)
         );
+        vm.roll(block.number + 10);
         testTarget.reveal(tokenId);
+        uint256[] memory randomWords = new uint256[](1);
+        randomWords[0] = uint256(0x300020001000a001400);
+
+        // Act
+        vm.broadcast(mockCoordinator);
+        testTarget.rawFulfillRandomWords(requestId, randomWords); // This function cover the fulfillRandomWords function
+
+        // Assert
+        assertEq(
+            testTarget.tokenURI(tokenId),
+            '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}',
+            "The token URI is not set correctly"
+        );
+    }
+
+    // @success_test Case: SeparateCollection
+    function test_fulfillRandomWords_SeparateCollection() external {
+        // Arrange
+        testTarget.setRevealType(RevealType.SeparateCollection);
+        vm.roll(block.number + 1);
+        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        uint256 requestId = 5;
+        vm.mockCall(
+            mockCoordinator,
+            abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector),
+            abi.encode(requestId)
+        );
+        vm.roll(block.number + 10);
+        testTarget.reveal(tokenId);
+        uint256[] memory randomWords = new uint256[](1);
+        randomWords[0] = uint256(0x300020001000a001400);
+
+        // Act
+        vm.broadcast(mockCoordinator);
+        testTarget.rawFulfillRandomWords(requestId, randomWords); // This function cover the fulfillRandomWords function
+
+        // Assert
+        assertEq(
+            RevealedNFT(testTarget.revealedNFT()).tokenURI(tokenId),
+            '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}',
+            "The token URI is not set correctly"
+        );
+    }
+
+    // @fail_test Case: Invalid reveal type
+    function test_fulfillRandomWords_fail_invalid_reveal_type() external {
+        // Arrange
+        testTarget.setRevealType(RevealType.None);
+        vm.roll(block.number + 1);
+        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        uint256 requestId = 5;
+        vm.mockCall(
+            mockCoordinator,
+            abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector),
+            abi.encode(requestId)
+        );
+        vm.roll(block.number + 10);
+        testTarget.reveal(tokenId);
+        uint256[] memory randomWords = new uint256[](1);
+        randomWords[0] = uint256(0x300020001000a001400);
+
+        // Act
+        vm.expectRevert("fulfillRandomWords: Invalid reveal type");
+        vm.broadcast(mockCoordinator);
+        testTarget.rawFulfillRandomWords(requestId, randomWords); // This function cover the fulfillRandomWords function
+    }
+
+    // @success_test
+    function test_createRevealedNFT() external {
+        // Arrange
+        testTarget.setRevealType(RevealType.SeparateCollection);
+
+        // Act
+        testTarget.createRevealedNFT();
+
+        // Assert
+        assertEq(RevealedNFT(testTarget.revealedNFT()).name(), "TEST_NAME", "The name is not set correctly");
+        assertEq(RevealedNFT(testTarget.revealedNFT()).symbol(), "TEST_SYMBOL", "The symbol is not set correctly");
+        assertEq(RevealedNFT(testTarget.revealedNFT()).owner(), address(this), "The owner is not set correctly");
+    }
+
+    // @fail_test Case: Not separate collection
+    function test_createRevealedNFT_fail_not_separate_collection() external {
+        // Arrange
+        testTarget.setRevealType(RevealType.InCollection);
+
+        // Act
+        vm.expectRevert("createRevealedNFT: Only available in SeparateCollection config");
+        testTarget.createRevealedNFT();
     }
 
     // @success_test

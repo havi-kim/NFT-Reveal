@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {VRFCoordinatorV2Interface} from "@chainlink/interfaces/vrf/VRFCoordinatorV2Interface.sol";
 
-library ChainlinkVRF {
+library ChainlinkVRFSepolia {
     /*
      * @dev Chainlink VRF configuration (Sepolia).
      *      It is recommended that configurations that are unlikely to change are declared constant and modified by contract upgrade.
@@ -17,6 +17,11 @@ library ChainlinkVRF {
     uint32 private constant _CALLBACK_GAS_LIMIT = 500000;
     uint64 private constant _SUBSCRIPTION_ID = uint64(0);
 
+    /**
+     * @dev Request random words from Chainlink VRF.
+     * @param numWord_ The number of words to request.
+     * @return requestId The request ID.
+     */
     function request(uint32 numWord_) internal returns (uint256 requestId) {
         requestId = _VRF_COORDINATOR.requestRandomWords(
             _VRF_KEY_HASH, _SUBSCRIPTION_ID, _VRF_REQUEST_CONFIRMATION, _CALLBACK_GAS_LIMIT, numWord_

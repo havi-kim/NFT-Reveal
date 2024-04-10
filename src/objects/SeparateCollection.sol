@@ -51,6 +51,14 @@ library SeparateCollection {
     }
 
     /**
+     * @dev Check if the revealed NFT is created.
+     * @return True if the revealed NFT is created.
+     */
+    function isRevealedNFTCreated() internal view returns (bool) {
+        return address(read().revealedNFT) != address(0);
+    }
+
+    /**
      * @dev Read the storage slot of the Reveal. If change visibility of this function to internal, encapsulation will break.
      * @return data The storage slot of the Reveal.
      */

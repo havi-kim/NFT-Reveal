@@ -83,7 +83,7 @@ library Reveal {
      */
     function getRevealRequest(uint256 requestId_) internal view returns (address to, uint256 tokenId) {
         RevealRequestStorage storage requestData = readRequest(requestId_);
-        return (requestData.to, uint(requestData.tokenId));
+        return (requestData.to, uint256(requestData.tokenId));
     }
 
     /**
