@@ -6,3 +6,9 @@ enum RevealType {
     SeparateCollection,
     None
 }
+
+enum RevealStatus {
+    NOT_REVEALED,
+    IN_PROGRESS,
+    REVEALED
+}

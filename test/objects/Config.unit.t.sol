@@ -83,9 +83,9 @@ contract ConfigUnitTest is Test {
         Config.init(mintPrice, mintStartBlock, revealType, revealStartBlock);
 
         // Assert
-        assertEq(Config.getMintPrice(), mintPrice, "Mint price is not set correctly");
+        assertEq(Config.mintPrice(), mintPrice, "Mint price is not set correctly");
         assertFalse(Config.isMintStarted(), "Mint start block is not set correctly");
-        assertTrue(Config.getRevealType() == revealType, "Reveal type is not set correctly");
+        assertTrue(Config.revealType() == revealType, "Reveal type is not set correctly");
         assertFalse(Config.isRevealStarted(), "Reveal start block is not set correctly");
     }
 
@@ -145,7 +145,7 @@ contract ConfigUnitTest is Test {
         Config.setMintPrice(200);
 
         // Assert
-        assertEq(Config.getMintPrice(), 200, "Mint price is not set correctly");
+        assertEq(Config.mintPrice(), 200, "Mint price is not set correctly");
     }
 
     // @fail_test Case: minting has already started
@@ -212,7 +212,7 @@ contract ConfigUnitTest is Test {
         Config.setRevealType(RevealType.SeparateCollection);
 
         // Assert
-        assertTrue(Config.getRevealType() == RevealType.SeparateCollection, "Reveal type is not set correctly");
+        assertTrue(Config.revealType() == RevealType.SeparateCollection, "Reveal type is not set correctly");
     }
 
     // @fail_test Case: reveal has already started

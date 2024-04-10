@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 // External imports
 import {OwnableUpgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import {ERC721Upgradeable} from "lib/openzeppelin-contracts-upgradeable/contracts/token/ERC721/ERC721Upgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // Internal imports
 import {IRevealedNFT} from "./interfaces/IRevealedNFT.sol";
@@ -13,7 +14,7 @@ import {Config} from "src/objects/Config.sol";
 import {Call} from "src/utils/Call.sol";
 import {Metadata} from "src/objects/Metadata.sol";
 
-contract RevealedNFT is IRevealedNFT, ERC721Upgradeable, OwnableUpgradeable {
+contract RevealedNFT is IRevealedNFT, UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable {
     //--------------------------------------------------------------------------------------
     //--------------------------------- CONSTANT & STATE  ----------------------------------
     //--------------------------------------------------------------------------------------
@@ -59,6 +60,16 @@ contract RevealedNFT is IRevealedNFT, ERC721Upgradeable, OwnableUpgradeable {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         return Metadata.getMetadata(tokenId);
     }
+
+    //--------------------------------------------------------------------------------------
+    //-------------------------------  INTERNAL FUNCTIONS   --------------------------------
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * @dev Authorize the upgrade. Only the owner can authorize the upgrade.
+     * @param newImplementation The address of the new implementation.
+     */
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     //--------------------------------------------------------------------------------------
     //------------------------------------  MODIFIERS  -------------------------------------

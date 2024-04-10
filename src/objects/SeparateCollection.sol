@@ -39,7 +39,11 @@ library SeparateCollection {
      * @param metadata_ The metadata of the NFT.
      */
     function mint(address to_, uint256 tokenId_, uint256 metadata_) internal {
-        read().revealedNFT.mint(to_, tokenId_, metadata_);
+        RevealStorage storage data = read();
+        if (address(data.revealedNFT) == address(0)) {
+            revert("mint: Not created");
+        }
+        data.revealedNFT.mint(to_, tokenId_, metadata_);
     }
 
     /**

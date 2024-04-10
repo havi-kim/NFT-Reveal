@@ -17,6 +17,7 @@ import {Reveal} from "src/objects/Reveal.sol";
 import {RevealType} from "src/types/GlobalEnum.sol";
 import {Metadata} from "src/objects/Metadata.sol";
 import {SeparateCollection} from "src/objects/SeparateCollection.sol";
+import {RevealStatus} from "src/types/GlobalEnum.sol";
 
 contract NFT is
     UUPSUpgradeable,
@@ -78,7 +79,7 @@ contract NFT is
 
         // 1. Check if the payment is sufficient. If surplus, refund it.
         {
-            uint256 mintingPrice = Config.getMintPrice();
+            uint256 mintingPrice = Config.mintPrice();
             if (msg.value < mintingPrice) {
                 revert("mint: Insufficient payment");
             }
@@ -110,6 +111,11 @@ contract NFT is
             requestId = ChainlinkVRFSepolia.request(1);
             Reveal.startReveal(tokenId_, requestId);
         }
+
+        // 2. Create the revealed NFT contract if needed
+        if (Config.revealType() == RevealType.SeparateCollection && !SeparateCollection.isRevealedNFTCreated()) {
+            SeparateCollection.createRevealedNFT(name(), symbol(), owner());
+        }
     }
 
     //--------------------------------------------------------------------------------------
@@ -120,7 +126,7 @@ contract NFT is
      * @dev Create the revealed NFT contract. Only available in SeparateCollection config.
      */
     function createRevealedNFT() external onlyOwner returns (address) {
-        if (Config.getRevealType() != RevealType.SeparateCollection) {
+        if (Config.revealType() != RevealType.SeparateCollection) {
             revert("createRevealedNFT: Only available in SeparateCollection config");
         }
         SeparateCollection.createRevealedNFT(name(), symbol(), owner());
@@ -197,6 +203,10 @@ contract NFT is
         return address(SeparateCollection.getRevealedNFT());
     }
 
+    function revealStatus(uint256 tokenId) external view returns (RevealStatus) {
+        return Reveal.status(tokenId);
+    }
+
     //--------------------------------------------------------------------------------------
     //-------------------------------  INTERNAL FUNCTIONS   --------------------------------
     //--------------------------------------------------------------------------------------
@@ -211,7 +221,7 @@ contract NFT is
         (uint256 tokenId, address to) = Reveal.endReveal(requestId_);
 
         // 1. Get the reveal type
-        RevealType revealType = Config.getRevealType();
+        RevealType revealType = Config.revealType();
 
         // 2. If the reveal type is InCollection, set the metadata
         if (revealType == RevealType.InCollection) {
@@ -221,9 +231,6 @@ contract NFT is
 
         // 3. If the reveal type is SeparateCollection, mint the revealed NFT
         if (revealType == RevealType.SeparateCollection) {
-            if (!SeparateCollection.isRevealedNFTCreated()) {
-                SeparateCollection.createRevealedNFT(name(), symbol(), owner());
-            }
             SeparateCollection.mint(to, tokenId, randomWords_[0]);
             return;
         }

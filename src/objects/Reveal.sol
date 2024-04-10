@@ -1,15 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {RevealStatus} from "src/types/GlobalEnum.sol";
+
 library Reveal {
     bytes32 private constant _STATUS_STORAGE = keccak256("src.objects.Reveal.StatusStorage.v1");
     bytes32 private constant _REQUEST_STORAGE = keccak256("src.objects.Reveal.RequestStorage.v1");
-
-    enum RevealStatus {
-        NOT_REVEALED,
-        IN_PROGRESS,
-        REVEALED
-    }
 
     struct RevealStatusStorage {
         RevealStatus status;
@@ -71,7 +67,7 @@ library Reveal {
      * @param tokenId_ The token ID.
      * @return The reveal status.
      */
-    function getRevealStatus(uint256 tokenId_) internal view returns (RevealStatus) {
+    function status(uint256 tokenId_) internal view returns (RevealStatus) {
         return readStatus(tokenId_).status;
     }
 
@@ -81,7 +77,7 @@ library Reveal {
      * @return to The address of the receiver.
      * @return tokenId The token ID.
      */
-    function getRevealRequest(uint256 requestId_) internal view returns (address to, uint256 tokenId) {
+    function request(uint256 requestId_) internal view returns (address to, uint256 tokenId) {
         RevealRequestStorage storage requestData = readRequest(requestId_);
         return (requestData.to, uint256(requestData.tokenId));
     }

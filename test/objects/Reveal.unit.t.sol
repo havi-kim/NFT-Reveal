@@ -3,7 +3,7 @@ pragma solidity >=0.8.11 <0.9.0;
 
 import "forge-std/Test.sol";
 
-import {Reveal} from "src/objects/Reveal.sol";
+import "src/objects/Reveal.sol";
 
 // This is a test code wrapper for forge coverage issue(forge coverage miss library test codes).
 contract WRevealUnitTest {
@@ -45,12 +45,10 @@ contract RevealUnitTest is Test {
         Reveal.startReveal(tokenId, requestId);
 
         // Assert
-        (address to, uint256 queriedTokenId) = Reveal.getRevealRequest(requestId);
+        (address to, uint256 queriedTokenId) = Reveal.request(requestId);
         assertTrue(to == msg.sender, "The address of the receiver is not correct");
         assertTrue(queriedTokenId == tokenId, "The token ID is not correct");
-        assertTrue(
-            Reveal.getRevealStatus(tokenId) == Reveal.RevealStatus.IN_PROGRESS, "The reveal status is not in progress"
-        );
+        assertTrue(Reveal.status(tokenId) == RevealStatus.IN_PROGRESS, "The reveal status is not in progress");
     }
 
     // @fail_test Case: the reveal process is already started
@@ -78,7 +76,7 @@ contract RevealUnitTest is Test {
         // Assert
         assertTrue(to == msg.sender, "The address of the receiver is not correct");
         assertTrue(queriedTokenId == tokenId, "The token ID is not correct");
-        assertTrue(Reveal.getRevealStatus(tokenId) == Reveal.RevealStatus.REVEALED, "The reveal status is not revealed");
+        assertTrue(Reveal.status(tokenId) == RevealStatus.REVEALED, "The reveal status is not revealed");
     }
 
     // @fail_test Case: the reveal process is not in progress

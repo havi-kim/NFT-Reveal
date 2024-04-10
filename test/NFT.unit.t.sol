@@ -117,6 +117,31 @@ contract NFTUnitTest is Test {
         testTarget.reveal(tokenId);
     }
 
+    // @success_test
+    function test_reveal_with_createRevealedNFT() external {
+        // Arrange
+        testTarget.setRevealType(RevealType.SeparateCollection);
+        uint256 requestId = 5;
+        vm.roll(block.number + 1);
+        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        address revealedNFT = testTarget.revealedNFT();
+
+        vm.roll(block.number + 10);
+
+        // Act
+        vm.mockCall(
+            mockCoordinator,
+            abi.encodeWithSelector(VRFCoordinatorV2Interface.requestRandomWords.selector),
+            abi.encode(requestId)
+        );
+        uint256 returnId = testTarget.reveal(tokenId);
+
+        // Assert
+        assertEq(returnId, requestId, "The return value is not correct");
+        assertTrue(revealedNFT == address(0), "The revealed NFT is already created");
+        assertTrue(testTarget.revealedNFT() != revealedNFT, "The revealed NFT is not created");
+    }
+
     // @success_test Case: InCollection
     function test_fulfillRandomWords_InCollection() external {
         // Arrange

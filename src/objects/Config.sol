@@ -163,7 +163,7 @@ library Config {
      * @dev Get the mint price.
      * @return The mint price.
      */
-    function getMintPrice() internal view returns (uint96) {
+    function mintPrice() internal view returns (uint96) {
         return read().mintPrice;
     }
 
@@ -171,7 +171,7 @@ library Config {
      * @dev Get the reveal type.
      * @return The reveal type.
      */
-    function getRevealType() internal view returns (RevealType) {
+    function revealType() internal view returns (RevealType) {
         return read().revealType;
     }
 
