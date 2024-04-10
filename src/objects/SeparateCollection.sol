@@ -5,31 +5,31 @@ import {ERC1967Proxy} from "@openzeppelin-contracts/proxy/ERC1967/ERC1967Proxy.s
 
 import {Config} from "src/objects/Config.sol";
 import {RevealType} from "src/types/GlobalEnum.sol";
-import {NFT} from "../NFT.sol";
-import {RevealedNFT, IRevealedNFT} from "../RevealedNFT.sol";
+import {NFT} from "src/NFT.sol";
+import {RevealedNFT, IRevealedNFT} from "src/RevealedNFT.sol";
 
 library SeparateCollection {
     bytes32 private constant _REVEAL_STORAGE = keccak256("src.objects.SeparateCollectionReveal.storage.v1");
 
     struct RevealStorage {
-        address revealContract;
+        IRevealedNFT revealedNFT;
     }
 
     /**
-     * @dev Separate the reveal NFT contract.
+     * @dev Create the revealed NFT contract.
      * @param name_ The name of the NFT.
      * @param symbol_ The symbol of the NFT.
      * @param owner_ The address of the owner.
      */
-    function separateRevealNFT(string memory name_, string memory symbol_, address owner_) internal {
+    function createRevealedNFT(string memory name_, string memory symbol_, address owner_) internal {
         RevealStorage storage data = read();
-        if (data.revealContract != address(0)) {
+        if (address(data.revealedNFT) != address(0)) {
             revert("Reveal: Already created");
         }
 
         address impl = address(new RevealedNFT());
         bytes memory initData = abi.encodeWithSelector(IRevealedNFT.initialize.selector, name_, symbol_, owner_);
-        data.revealContract = address(new ERC1967Proxy(impl, initData));
+        data.revealedNFT = IRevealedNFT(address(new ERC1967Proxy(impl, initData)));
     }
 
     /**
@@ -39,15 +39,15 @@ library SeparateCollection {
      * @param metadata_ The metadata of the NFT.
      */
     function mint(address to_, uint256 tokenId_, uint256 metadata_) internal {
-        IRevealedNFT(read().revealContract).mint(to_, tokenId_, metadata_);
+        read().revealedNFT.mint(to_, tokenId_, metadata_);
     }
 
     /**
      * @dev Get the reveal contract.
      * @return The reveal contract.
      */
-    function revealContract() internal view returns (address) {
-        return read().revealContract;
+    function getRevealedNFT() internal view returns (IRevealedNFT) {
+        return read().revealedNFT;
     }
 
     /**

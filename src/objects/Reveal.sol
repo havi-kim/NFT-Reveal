@@ -67,6 +67,26 @@ library Reveal {
     }
 
     /**
+     * @dev Get the reveal status of the token.
+     * @param tokenId_ The token ID.
+     * @return The reveal status.
+     */
+    function getRevealStatus(uint256 tokenId_) internal view returns (RevealStatus) {
+        return readStatus(tokenId_).status;
+    }
+
+    /**
+     * @dev Get the reveal request.
+     * @param requestId_ The request ID.
+     * @return to The address of the receiver.
+     * @return tokenId The token ID.
+     */
+    function getRevealRequest(uint256 requestId_) internal view returns (address to, uint256 tokenId) {
+        RevealRequestStorage storage requestData = readRequest(requestId_);
+        return (requestData.to, uint(requestData.tokenId));
+    }
+
+    /**
      * @dev Read the storage slot of the reveal status. If change visibility of this function to internal, encapsulation will break.
      * @return data The storage slot of the reveal status.
      */

@@ -161,13 +161,105 @@ contract NFTUnitTest is Test {
     function test_withdraw_fail_not_owner() external {
         // Arrange
         vm.roll(block.number + 1);
-        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        testTarget.mint{value: mintPrice}();
         uint256 testAmount = 0.001e18;
 
         // Act
         vm.broadcast(address(0x1));
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(0x1)));
         testTarget.withdraw(testAmount);
+    }
+
+    // @success_test
+    function test_setMintPrice() external {
+        // Arrange
+        uint96 newPrice = 0.2 ether;
+
+        // Act
+        testTarget.setMintPrice(newPrice);
+
+        // Assert
+        assertEq(testTarget.config().mintPrice, newPrice, "The mint price is not set correctly");
+    }
+
+    // @fail_test Case: Not owner
+    function test_setMintPrice_fail_not_owner() external {
+        // Arrange
+        uint96 newPrice = 0.2 ether;
+
+        // Act
+        vm.broadcast(address(0x1));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(0x1)));
+        testTarget.setMintPrice(newPrice);
+    }
+
+    // @success_test
+    function test_setMintStartBlock() external {
+        // Arrange
+        uint48 newBlock = uint48(block.number + 5);
+
+        // Act
+        testTarget.setMintStartBlock(newBlock);
+
+        // Assert
+        assertEq(testTarget.config().mintStartBlock, newBlock, "The mint start block is not set correctly");
+    }
+
+    // @fail_test Case: Not owner
+    function test_setMintStartBlock_fail_not_owner() external {
+        // Arrange
+        uint48 newBlock = uint48(block.number + 5);
+
+        // Act
+        vm.broadcast(address(0x1));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(0x1)));
+        testTarget.setMintStartBlock(newBlock);
+    }
+
+    // @success_test
+    function test_setRevealType() external {
+        // Arrange
+        RevealType newType = RevealType.SeparateCollection;
+
+        // Act
+        testTarget.setRevealType(newType);
+
+        // Assert
+        assertTrue(testTarget.config().revealType == newType, "The reveal type is not set correctly");
+    }
+
+    // @fail_test Case: Not owner
+    function test_setRevealType_fail_not_owner() external {
+        // Arrange
+        RevealType newType = RevealType.SeparateCollection;
+
+        // Act
+        vm.broadcast(address(0x1));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(0x1)));
+        testTarget.setRevealType(newType);
+    }
+
+    // @success_test
+    function test_setRevealStartBlock() external {
+        // Arrange
+        uint48 newBlock = uint48(block.number + 10);
+
+        // Act
+        testTarget.setRevealStartBlock(newBlock);
+
+        // Assert
+        assertEq(testTarget.config().revealStartBlock, newBlock, "The reveal start block is not set correctly");
+    }
+
+    // @fail_test Case: Not owner
+    function test_setRevealStartBlock_fail_not_owner() external {
+        // Arrange
+        uint48 newBlock = uint48(block.number + 10);
+
+        // Act
+        vm.broadcast(address(0x1));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(0x1)));
+        testTarget.setRevealStartBlock(newBlock);
     }
 
     receive() external payable {}
