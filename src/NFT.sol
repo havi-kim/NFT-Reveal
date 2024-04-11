@@ -20,6 +20,12 @@ import {SeparateCollection} from "src/objects/SeparateCollection.sol";
 import {RevealStatus} from "src/types/GlobalEnum.sol";
 import {ConfigError, CollectionError} from "src/errors/Error.sol";
 
+/**
+ * @title NFT with multiple reveal options.
+ * @dev The NFT contract. It supports multiple reveal options.
+ *      First, the reveal can be done in the same contract. When reveal, only the metadata is set.
+ *      Second, the reveal can be done in a separate contract. When reveal, the revealed NFT is minted with metadata and the original NFT is burned.
+ */
 contract NFT is
     UUPSUpgradeable,
     ERC721Upgradeable,
@@ -230,7 +236,7 @@ contract NFT is
             return;
         }
 
-        // 3. If the reveal type is SeparateCollection, mint the revealed NFT
+        // 3. If the reveal type is SeparateCollection, mint the revealed NFT & burn the original NFT
         if (revealType == RevealType.SeparateCollection) {
             SeparateCollection.mint(to, tokenId, randomWords_[0]);
             _burn(tokenId);

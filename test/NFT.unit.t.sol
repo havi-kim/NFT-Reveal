@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
@@ -108,7 +108,6 @@ contract NFTUnitTest is Test {
     // @fail_test Case: Reveal has not started yet
     function test_reveal_fail_reveal_not_start() external {
         // Arrange
-        uint256 requestId = 5;
         vm.roll(block.number + 1);
         uint256 tokenId = testTarget.mint{value: mintPrice}();
 
@@ -197,7 +196,11 @@ contract NFTUnitTest is Test {
             '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}',
             "The token URI is not set correctly"
         );
-        assertEq(RevealedNFT(testTarget.revealedNFT()).ownerOf(tokenId), address(this), "The owner of revealed NFT is not minted");
+        assertEq(
+            RevealedNFT(testTarget.revealedNFT()).ownerOf(tokenId),
+            address(this),
+            "The owner of revealed NFT is not minted"
+        );
         vm.expectRevert();
         testTarget.ownerOf(tokenId); // Original NFT burn check
     }
@@ -253,7 +256,7 @@ contract NFTUnitTest is Test {
     function test_withdraw() external {
         // Arrange
         vm.roll(block.number + 1);
-        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        testTarget.mint{value: mintPrice}();
         uint256 balanceOfThis = address(this).balance;
         uint256 balanceOfTarget = address(testTarget).balance;
         uint256 testAmount = 0.001e18;
@@ -272,7 +275,7 @@ contract NFTUnitTest is Test {
     function test_withdraw_over_balance() external {
         // Arrange
         vm.roll(block.number + 1);
-        uint256 tokenId = testTarget.mint{value: mintPrice}();
+        testTarget.mint{value: mintPrice}();
         uint256 balanceOfThis = address(this).balance;
         uint256 balanceOfTarget = address(testTarget).balance;
         uint256 testAmount = balanceOfTarget + 0.001e18;

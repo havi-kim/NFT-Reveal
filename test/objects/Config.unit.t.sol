@@ -107,7 +107,11 @@ contract ConfigUnitTest is Test {
         uint48 mintStartBlock = uint48(block.number - 1);
 
         // Act
-        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock.selector, mintStartBlock, block.number));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock.selector, mintStartBlock, block.number
+            )
+        );
         Config.init(mintPrice, mintStartBlock, RevealType.InCollection, 0);
     }
 
@@ -119,7 +123,11 @@ contract ConfigUnitTest is Test {
         uint48 revealStartBlock = mintStartBlock - 1;
 
         // Act
-        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartShouldEarlierThanRevealStart.selector, mintStartBlock, revealStartBlock));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                ConfigError.MintStartShouldEarlierThanRevealStart.selector, mintStartBlock, revealStartBlock
+            )
+        );
         Config.init(mintPrice, mintStartBlock, RevealType.InCollection, revealStartBlock);
     }
 
@@ -190,7 +198,11 @@ contract ConfigUnitTest is Test {
         Config.init(1, uint48(block.number + 1), RevealType.InCollection, uint48(block.number + 20));
 
         // Act
-        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock.selector, block.number, block.number));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock.selector, block.number, block.number
+            )
+        );
         Config.setMintStartBlock(uint48(block.number));
     }
 
@@ -200,7 +212,11 @@ contract ConfigUnitTest is Test {
         Config.init(1, uint48(block.number + 1), RevealType.InCollection, uint48(block.number + 20));
 
         // Act
-        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartShouldEarlierThanRevealStart.selector, block.number + 20, block.number + 20));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                ConfigError.MintStartShouldEarlierThanRevealStart.selector, block.number + 20, block.number + 20
+            )
+        );
         Config.setMintStartBlock(uint48(block.number + 20));
     }
 

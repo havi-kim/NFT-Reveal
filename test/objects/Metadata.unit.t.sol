@@ -61,7 +61,7 @@ contract MetadataUnitTest is Test {
     }
 
     // @succes_test
-    function $test_getMetadata() external {
+    function $test_getMetadata() external view {
         // Arrange
         uint256 tokenId = 1;
 

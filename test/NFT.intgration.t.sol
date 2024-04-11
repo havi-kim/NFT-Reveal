@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
@@ -33,7 +33,6 @@ contract NFTIntegrationTest is Test {
 
     // @success_test
     function test_case_user_sequence_InCollection() external {
-
         // Deploy contract
         address impl = address(new NFT());
 
@@ -83,9 +82,7 @@ contract NFTIntegrationTest is Test {
         }
         uint256 requestId = nftContract.reveal(tokenId);
         // Test start reveal
-        assertTrue(
-            nftContract.revealStatus(tokenId) == RevealStatus.InProgress, "The reveal status is not in progress"
-        );
+        assertTrue(nftContract.revealStatus(tokenId) == RevealStatus.InProgress, "The reveal status is not in progress");
 
         // Coordinator fulfill the random words
         uint256[] memory randomWords = new uint256[](1);
@@ -152,9 +149,7 @@ contract NFTIntegrationTest is Test {
         }
         uint256 requestId = nftContract.reveal(tokenId);
         // Test start reveal
-        assertTrue(
-            nftContract.revealStatus(tokenId) == RevealStatus.InProgress, "The reveal status is not in progress"
-        );
+        assertTrue(nftContract.revealStatus(tokenId) == RevealStatus.InProgress, "The reveal status is not in progress");
 
         // Coordinator fulfill the random words
         uint256[] memory randomWords = new uint256[](1);
@@ -197,10 +192,15 @@ contract NFTIntegrationTest is Test {
         // Upgrade NFT contract to RevealedNFT contract
         vm.broadcast(owner);
         nftContract.upgradeToAndCall(revealedNFTImpl, "");
+        // If upgrade is not successful, this should revert
+        vm.broadcast(address(this));
+        RevealedNFT(address(nftContract)).mint(user0, 1, 0x300020001000a001400);
 
         // Upgrade RevealedNFT contract to NFT contract
         vm.broadcast(owner);
         revealedNFT.upgradeToAndCall(nftImpl, "");
+        // If upgrade is not successful, this should revert
+        NFT(address(revealedNFT)).revealedNFT();
     }
 }
 

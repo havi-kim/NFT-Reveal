@@ -15,6 +15,10 @@ import {Call} from "src/utils/Call.sol";
 import {Metadata} from "src/objects/Metadata.sol";
 import {RevealedNFTError} from "src/errors/Error.sol";
 
+/**
+ * @title Revealed NFT.
+ * @dev The revealed NFT contract. It is a child contract of the parent NFT contract.
+ */
 contract RevealedNFT is IRevealedNFT, UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable {
     //--------------------------------------------------------------------------------------
     //--------------------------------- CONSTANT & STATE  ----------------------------------
