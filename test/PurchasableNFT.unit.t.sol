@@ -7,7 +7,7 @@ import {VRFCoordinatorV2Interface} from "@chainlink/interfaces/vrf/VRFCoordinato
 import "src/PurchasableNFT.sol";
 import "src/RevealedNFT.sol";
 
-contract NFTUnitTest is Test {
+contract PurchasableNFTUnitTest is Test {
     PurchasableNFT private testTarget;
     address private mockCoordinator = address(0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625);
     uint96 private mintPrice = 0.1 ether;
