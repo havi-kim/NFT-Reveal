@@ -1,0 +1,36 @@
+{
+  "name": "NFT-Reveal",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "forge test",
+    "test_sepolia": "FORK_RPC=https://sepolia.gateway.tenderly.co forge test",
+    "coverage": "forge coverage --report lcov && lcov --remove lcov.info -o lcov.info 'test/*' 'script/*' && genhtml -o coverage_report lcov.info",
+
+    "createRevealedNFT": "NETWORK=LOCAL forge script script/admin/createRevealedNFT.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "createRevealedNFT_sepolia": "NETWORK=SEPOLIA forge script script/admin/createRevealedNFT.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "setMintPrice": "NETWORK=LOCAL forge script script/admin/setMintPrice.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "setMintPrice_sepolia": "NETWORK=SEPOLIA forge script script/admin/setMintPrice.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "setMintStartBlock": "NETWORK=LOCAL forge script script/admin/setMintStartBlock.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "setMintStartBlock_sepolia": "NETWORK=SEPOLIA forge script script/admin/setMintStartBlock.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "setRevealStartBlock": "NETWORK=LOCAL forge script script/admin/setRevealStartBlock.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "setRevealStartBlock_sepolia": "NETWORK=SEPOLIA forge script script/admin/setRevealStartBlock.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "setRevealType": "NETWORK=LOCAL forge script script/admin/setRevealType.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "setRevealType_sepolia": "NETWORK=SEPOLIA forge script script/admin/setRevealType.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "withdraw": "NETWORK=LOCAL forge script script/admin/withdraw.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "withdraw_sepolia": "NETWORK=SEPOLIA forge script script/admin/withdraw.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "mintNFT": "NETWORK=LOCAL forge script script/user/mintNFT.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "mintNFT_sepolia": "NETWORK=SEPOLIA forge script script/user/mintNFT.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "revealNFT": "NETWORK=LOCAL forge script script/user/revealNFT.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "revealNFT_sepolia": "NETWORK=SEPOLIA forge script script/user/revealNFT.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast",
+
+    "deployNFT": "NETWORK=LOCAL forge script script/deployNFT.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "deployNFT_sepolia": "NETWORK=SEPOLIA forge script script/deployNFT.s.sol --rpc-url https://sepolia.gateway.tenderly.co --broadcast"
+  }
+}
