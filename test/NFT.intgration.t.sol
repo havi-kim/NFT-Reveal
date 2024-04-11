@@ -84,7 +84,7 @@ contract NFTIntegrationTest is Test {
         uint256 requestId = nftContract.reveal(tokenId);
         // Test start reveal
         assertTrue(
-            nftContract.revealStatus(tokenId) == RevealStatus.IN_PROGRESS, "The reveal status is not in progress"
+            nftContract.revealStatus(tokenId) == RevealStatus.InProgress, "The reveal status is not in progress"
         );
 
         // Coordinator fulfill the random words
@@ -93,7 +93,7 @@ contract NFTIntegrationTest is Test {
         vm.broadcast(mockCoordinator);
         nftContract.rawFulfillRandomWords(requestId, randomWords);
         // Test end reveal
-        assertTrue(nftContract.revealStatus(tokenId) == RevealStatus.REVEALED, "The reveal status is not revealed");
+        assertTrue(nftContract.revealStatus(tokenId) == RevealStatus.Revealed, "The reveal status is not revealed");
         assertEq(
             nftContract.tokenURI(tokenId),
             '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}',
@@ -153,7 +153,7 @@ contract NFTIntegrationTest is Test {
         uint256 requestId = nftContract.reveal(tokenId);
         // Test start reveal
         assertTrue(
-            nftContract.revealStatus(tokenId) == RevealStatus.IN_PROGRESS, "The reveal status is not in progress"
+            nftContract.revealStatus(tokenId) == RevealStatus.InProgress, "The reveal status is not in progress"
         );
 
         // Coordinator fulfill the random words
@@ -163,7 +163,7 @@ contract NFTIntegrationTest is Test {
         nftContract.rawFulfillRandomWords(requestId, randomWords);
         // Test end reveal
         RevealedNFT revealedNFT = RevealedNFT(nftContract.revealedNFT());
-        assertTrue(nftContract.revealStatus(tokenId) == RevealStatus.REVEALED, "The reveal status is not revealed");
+        assertTrue(nftContract.revealStatus(tokenId) == RevealStatus.Revealed, "The reveal status is not revealed");
         assertEq(
             revealedNFT.tokenURI(tokenId),
             '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}',
@@ -173,8 +173,8 @@ contract NFTIntegrationTest is Test {
 
     // @sucess_test
     function test_upgrade() external {
-        address impl = address(new NFT());
-        address upgradeImpl = address(new RevealedNFT());
+        address nftImpl = address(new NFT());
+        address revealedNFTImpl = address(new RevealedNFT());
 
         // Initialize NFT contract
         vm.broadcast(owner);
@@ -185,14 +185,22 @@ contract NFTIntegrationTest is Test {
             mockCoordinator,
             mintPrice,
             uint48(block.number + 1),
-            RevealType.InCollection,
+            RevealType.SeparateCollection,
             uint48(block.number + 100)
         );
 
-        NFT nftContract = NFT(address(new ERC1967Proxy(impl, initData)));
-
+        NFT nftContract = NFT(address(new ERC1967Proxy(nftImpl, initData)));
         vm.broadcast(owner);
-        nftContract.upgradeToAndCall(upgradeImpl, "");
+        nftContract.createRevealedNFT();
+        RevealedNFT revealedNFT = RevealedNFT(nftContract.revealedNFT());
+
+        // Upgrade NFT contract to RevealedNFT contract
+        vm.broadcast(owner);
+        nftContract.upgradeToAndCall(revealedNFTImpl, "");
+
+        // Upgrade RevealedNFT contract to NFT contract
+        vm.broadcast(owner);
+        revealedNFT.upgradeToAndCall(nftImpl, "");
     }
 }
 

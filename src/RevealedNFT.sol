@@ -13,6 +13,7 @@ import {IdSeed} from "src/utils/IdGenerator.sol";
 import {Config} from "src/objects/Config.sol";
 import {Call} from "src/utils/Call.sol";
 import {Metadata} from "src/objects/Metadata.sol";
+import {RevealedNFTError} from "src/errors/Error.sol";
 
 contract RevealedNFT is IRevealedNFT, UUPSUpgradeable, ERC721Upgradeable, OwnableUpgradeable {
     //--------------------------------------------------------------------------------------
@@ -76,7 +77,9 @@ contract RevealedNFT is IRevealedNFT, UUPSUpgradeable, ERC721Upgradeable, Ownabl
     //--------------------------------------------------------------------------------------
 
     modifier onlyParent() {
-        require(msg.sender == _PARENT_NFT, "RevealedNFT: Only parent NFT contract can call");
+        if (msg.sender != _PARENT_NFT) {
+            revert RevealedNFTError.OnlyParentNFT(_PARENT_NFT, msg.sender);
+        }
         _;
     }
 }

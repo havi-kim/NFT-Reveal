@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {RevealType} from "../types/GlobalEnum.sol";
+import {ConfigError} from "src/errors/Error.sol";
 
 library Config {
     bytes32 private constant _CONFIG_STORAGE = keccak256("src.objects.Config.storage.v1");
@@ -31,20 +32,20 @@ library Config {
         // 0. Check the validity of the parameters
         {
             if (mintPrice_ == 0) {
-                revert("init: mintPrice should be non-zero");
+                revert ConfigError.MintPriceShouldNotBeZero();
             }
             if (mintStartBlock_ <= block.number) {
-                revert("init: mintStartBlock should be greater than the current block number");
+                revert ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock(mintStartBlock_, block.number);
             }
             if (revealStartBlock_ <= mintStartBlock_) {
-                revert("init: revealStartBlock should be greater than mintStartBlock");
+                revert ConfigError.MintStartShouldEarlierThanRevealStart(mintStartBlock_, revealStartBlock_);
             }
         }
 
         // 1. Check double initialization
         {
             if (data.mintPrice != 0) {
-                revert("init: Already initialized");
+                revert ConfigError.ConfigAlreadyInitialized();
             }
         }
 
@@ -67,7 +68,7 @@ library Config {
         // 0. Check if mint has started
         {
             if (isMintStarted()) {
-                revert("setMintPrice: Mint has already started");
+                revert ConfigError.MintAlreadyStarted();
             }
         }
 
@@ -87,13 +88,13 @@ library Config {
         // 0. Check validity of the status
         {
             if (isMintStarted()) {
-                revert("setMintStartBlock: Mint has already started");
+                revert ConfigError.MintAlreadyStarted();
             }
             if (startBlock_ <= block.number) {
-                revert("setMintStartBlock: startBlock should be greater than the current block number");
+                revert ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock(startBlock_, block.number);
             }
             if (startBlock_ >= data.revealStartBlock) {
-                revert("setMintStartBlock: startBlock should be less than revealStartBlock");
+                revert ConfigError.MintStartShouldEarlierThanRevealStart(startBlock_, data.revealStartBlock);
             }
         }
 
@@ -113,7 +114,7 @@ library Config {
         // 0. Check if reveal has started
         {
             if (isRevealStarted()) {
-                revert("setRevealType: Reveal has already started");
+                revert ConfigError.RevealAlreadyStarted();
             }
         }
 
@@ -133,7 +134,7 @@ library Config {
         // 0. Check if reveal has started
         {
             if (isRevealStarted()) {
-                revert("setRevealStartBlock: Reveal has already started");
+                revert ConfigError.RevealAlreadyStarted();
             }
         }
 

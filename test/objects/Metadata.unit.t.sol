@@ -4,6 +4,7 @@ pragma solidity >=0.8.11 <0.9.0;
 import "forge-std/Test.sol";
 
 import {Metadata} from "src/objects/Metadata.sol";
+import {MetadataError} from "src/errors/Error.sol";
 
 // This is a test code wrapper for forge coverage issue(forge coverage miss library test codes).
 contract WMetadataUnitTest {
@@ -55,7 +56,7 @@ contract MetadataUnitTest is Test {
         Metadata.setMetadata(tokenId, metadata);
 
         // Act
-        vm.expectRevert("setMetadata: Already set");
+        vm.expectRevert(MetadataError.MetadataAlreadyInitialized.selector);
         Metadata.setMetadata(tokenId, metadata);
     }
 

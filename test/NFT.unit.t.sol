@@ -60,7 +60,7 @@ contract NFTUnitTest is Test {
     // @fail_test Case: minting has not started yet
     function test_mint_fail_minting_not_start() external {
         // Act
-        vm.expectRevert("mint: Minting has not started yet");
+        vm.expectRevert(ConfigError.MintingHasNotStarted.selector);
         testTarget.mint();
     }
 
@@ -70,7 +70,7 @@ contract NFTUnitTest is Test {
         vm.roll(block.number + 10);
 
         // Act
-        vm.expectRevert("mint: Reveal has already started");
+        vm.expectRevert(ConfigError.RevealAlreadyStarted.selector);
         testTarget.mint();
     }
 
@@ -80,7 +80,7 @@ contract NFTUnitTest is Test {
         vm.roll(block.number + 1);
 
         // Act
-        vm.expectRevert("mint: Insufficient payment");
+        vm.expectRevert(abi.encodeWithSelector(ConfigError.InsufficientPayment.selector, mintPrice, mintPrice - 1));
         testTarget.mint{value: mintPrice - 1}();
     }
 
@@ -113,7 +113,7 @@ contract NFTUnitTest is Test {
         uint256 tokenId = testTarget.mint{value: mintPrice}();
 
         // Act
-        vm.expectRevert("reveal: Reveal has not started yet");
+        vm.expectRevert(ConfigError.RevealHasNotStarted.selector);
         testTarget.reveal(tokenId);
     }
 
@@ -197,6 +197,9 @@ contract NFTUnitTest is Test {
             '{"name": "The revealed NFT-1", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}',
             "The token URI is not set correctly"
         );
+        assertEq(RevealedNFT(testTarget.revealedNFT()).ownerOf(tokenId), address(this), "The owner of revealed NFT is not minted");
+        vm.expectRevert();
+        testTarget.ownerOf(tokenId); // Original NFT burn check
     }
 
     // @fail_test Case: Invalid reveal type
@@ -217,7 +220,7 @@ contract NFTUnitTest is Test {
         randomWords[0] = uint256(0x300020001000a001400);
 
         // Act
-        vm.expectRevert("fulfillRandomWords: Invalid reveal type");
+        vm.expectRevert(abi.encodeWithSelector(CollectionError.InvalidCollectionType.selector, RevealType.None));
         vm.broadcast(mockCoordinator);
         testTarget.rawFulfillRandomWords(requestId, randomWords); // This function cover the fulfillRandomWords function
     }
@@ -242,7 +245,7 @@ contract NFTUnitTest is Test {
         testTarget.setRevealType(RevealType.InCollection);
 
         // Act
-        vm.expectRevert("createRevealedNFT: Only available in SeparateCollection config");
+        vm.expectRevert(ConfigError.OnlySeparateCollectionType.selector);
         testTarget.createRevealedNFT();
     }
 

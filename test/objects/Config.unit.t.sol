@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 
 import {Config} from "src/objects/Config.sol";
 import {RevealType} from "src/types/GlobalEnum.sol";
+import {ConfigError} from "src/errors/Error.sol";
 
 // This is a test code wrapper for forge coverage issue(forge coverage miss library test codes).
 contract WConfigUnitTest {
@@ -95,7 +96,7 @@ contract ConfigUnitTest is Test {
         uint96 mintPrice = 0;
 
         // Act
-        vm.expectRevert("init: mintPrice should be non-zero");
+        vm.expectRevert(ConfigError.MintPriceShouldNotBeZero.selector);
         Config.init(mintPrice, 0, RevealType.InCollection, 0);
     }
 
@@ -106,7 +107,7 @@ contract ConfigUnitTest is Test {
         uint48 mintStartBlock = uint48(block.number - 1);
 
         // Act
-        vm.expectRevert("init: mintStartBlock should be greater than the current block number");
+        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock.selector, mintStartBlock, block.number));
         Config.init(mintPrice, mintStartBlock, RevealType.InCollection, 0);
     }
 
@@ -118,7 +119,7 @@ contract ConfigUnitTest is Test {
         uint48 revealStartBlock = mintStartBlock - 1;
 
         // Act
-        vm.expectRevert("init: revealStartBlock should be greater than mintStartBlock");
+        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartShouldEarlierThanRevealStart.selector, mintStartBlock, revealStartBlock));
         Config.init(mintPrice, mintStartBlock, RevealType.InCollection, revealStartBlock);
     }
 
@@ -132,7 +133,7 @@ contract ConfigUnitTest is Test {
         Config.init(mintPrice, mintStartBlock, revealType, revealStartBlock);
 
         // Act
-        vm.expectRevert("init: Already initialized");
+        vm.expectRevert(ConfigError.ConfigAlreadyInitialized.selector);
         Config.init(mintPrice, mintStartBlock, revealType, revealStartBlock);
     }
 
@@ -155,7 +156,7 @@ contract ConfigUnitTest is Test {
         vm.roll(block.number + 10);
 
         // Act
-        vm.expectRevert("setMintPrice: Mint has already started");
+        vm.expectRevert(ConfigError.MintAlreadyStarted.selector);
         Config.setMintPrice(200);
     }
 
@@ -179,7 +180,7 @@ contract ConfigUnitTest is Test {
         vm.roll(block.number + 10);
 
         // Act
-        vm.expectRevert("setMintStartBlock: Mint has already started");
+        vm.expectRevert(ConfigError.MintAlreadyStarted.selector);
         Config.setMintStartBlock(uint48(block.number + 1));
     }
 
@@ -189,7 +190,7 @@ contract ConfigUnitTest is Test {
         Config.init(1, uint48(block.number + 1), RevealType.InCollection, uint48(block.number + 20));
 
         // Act
-        vm.expectRevert("setMintStartBlock: startBlock should be greater than the current block number");
+        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartBlockShouldBeGreaterThanCurrentBlock.selector, block.number, block.number));
         Config.setMintStartBlock(uint48(block.number));
     }
 
@@ -199,7 +200,7 @@ contract ConfigUnitTest is Test {
         Config.init(1, uint48(block.number + 1), RevealType.InCollection, uint48(block.number + 20));
 
         // Act
-        vm.expectRevert("setMintStartBlock: startBlock should be less than revealStartBlock");
+        vm.expectRevert(abi.encodeWithSelector(ConfigError.MintStartShouldEarlierThanRevealStart.selector, block.number + 20, block.number + 20));
         Config.setMintStartBlock(uint48(block.number + 20));
     }
 
@@ -222,7 +223,7 @@ contract ConfigUnitTest is Test {
         vm.roll(block.number + 2);
 
         // Act
-        vm.expectRevert("setRevealType: Reveal has already started");
+        vm.expectRevert(ConfigError.RevealAlreadyStarted.selector);
         Config.setRevealType(RevealType.SeparateCollection);
     }
 
@@ -246,7 +247,7 @@ contract ConfigUnitTest is Test {
         vm.roll(block.number + 2);
 
         // Act
-        vm.expectRevert("setRevealStartBlock: Reveal has already started");
+        vm.expectRevert(ConfigError.RevealAlreadyStarted.selector);
         Config.setRevealStartBlock(uint48(block.number + 1));
     }
 }

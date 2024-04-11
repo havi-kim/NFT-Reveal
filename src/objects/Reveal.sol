@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {RevealStatus} from "src/types/GlobalEnum.sol";
+import {RevealError} from "src/errors/Error.sol";
 
 library Reveal {
     bytes32 private constant _STATUS_STORAGE = keccak256("src.objects.Reveal.StatusStorage.v1");
@@ -27,12 +28,12 @@ library Reveal {
         RevealRequestStorage storage requestData = readRequest(requestId_);
 
         // 1. Check the status
-        if (statusData.status != RevealStatus.NOT_REVEALED) {
-            revert("setStatusInProgress: Already started");
+        if (statusData.status != RevealStatus.UnRevealed) {
+            revert RevealError.RevealProcessAlreadyStarted(tokenId_);
         }
 
         // 2. Set the status
-        statusData.status = RevealStatus.IN_PROGRESS;
+        statusData.status = RevealStatus.InProgress;
         requestData.to = msg.sender;
         requestData.tokenId = uint96(tokenId_); // Incremental ID cannot over 2^96
     }
@@ -52,12 +53,12 @@ library Reveal {
         RevealStatusStorage storage statusData = readStatus(tokenId);
 
         // 2. Check the status
-        if (statusData.status != RevealStatus.IN_PROGRESS) {
-            revert("setStatusRevealed: Not in progress");
+        if (statusData.status != RevealStatus.InProgress) {
+            revert RevealError.RevealProcessNotInProgress(tokenId);
         }
 
         // 3. Set the status
-        statusData.status = RevealStatus.REVEALED;
+        statusData.status = RevealStatus.Revealed;
         requestData.to = address(0);
         requestData.tokenId = 0;
     }

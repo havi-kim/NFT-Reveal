@@ -6,6 +6,7 @@ import "forge-std/Test.sol";
 import {SeparateCollection} from "src/objects/SeparateCollection.sol";
 import {IRevealedNFT} from "src/interfaces/IRevealedNFT.sol";
 import {RevealedNFT} from "src/RevealedNFT.sol";
+import {CollectionError} from "src/errors/Error.sol";
 
 // This is a test code wrapper for forge coverage issue(forge coverage miss library test codes).
 contract WSeparateCollectionUnitTest {
@@ -21,7 +22,7 @@ contract WSeparateCollectionUnitTest {
     }
 
     // @fail_test Case: Already created
-    function test_createRevealedNFT_fail_already_created() external {
+    function test_createRevealedNFT_fail() external {
         testTarget.test_createRevealedNFT_fail_already_created();
     }
 
@@ -56,9 +57,10 @@ contract SeparateCollectionUnitTest is Test {
         string memory symbol = "TEST_SYMBOL";
         address owner = address(0x123);
         SeparateCollection.createRevealedNFT(name, symbol, owner);
+        address revealedNFT = address(SeparateCollection.getRevealedNFT());
 
         // Act
-        vm.expectRevert("Reveal: Already created");
+        vm.expectRevert(abi.encodeWithSelector(CollectionError.CollectionAlreadyCreated.selector, revealedNFT));
         SeparateCollection.createRevealedNFT(name, symbol, owner);
     }
 
@@ -80,5 +82,17 @@ contract SeparateCollectionUnitTest is Test {
             RevealedNFT(address(revealedNFT)).tokenURI(tokenId),
             '{"name": "The revealed NFT-10", "stats": {"strength": 20, "intelligence": 10, "wisdom": 1, "charisma": 2, "dexterity": 3}}'
         );
+    }
+
+    // @fail_test Case: Not created
+    function test_mint_fail_not_created() external {
+        // Arrange
+        address to = address(0x1);
+        uint256 tokenId = 10;
+        uint256 metadata = uint256(0x300020001000a001400);
+
+        // Act
+        vm.expectRevert(CollectionError.CollectionNotCreated.selector);
+        SeparateCollection.mint(to, tokenId, metadata);
     }
 }

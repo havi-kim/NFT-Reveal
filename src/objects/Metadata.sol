@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {MetadataError} from "src/errors/Error.sol";
 
 library Metadata {
     bytes32 private constant _METADATA_STORAGE = keccak256("src.objects.Metadata.storage.v1");
@@ -25,7 +26,7 @@ library Metadata {
     function setMetadata(uint256 tokenId_, uint256 metadata_) internal {
         MetadataStorage storage data = read(tokenId_);
         if (data.initialized) {
-            revert("setMetadata: Already set");
+            revert MetadataError.MetadataAlreadyInitialized();
         }
         assembly {
             sstore(data.slot, metadata_)

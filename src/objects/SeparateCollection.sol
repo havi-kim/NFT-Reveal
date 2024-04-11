@@ -7,6 +7,7 @@ import {Config} from "src/objects/Config.sol";
 import {RevealType} from "src/types/GlobalEnum.sol";
 import {NFT} from "src/NFT.sol";
 import {RevealedNFT, IRevealedNFT} from "src/RevealedNFT.sol";
+import {CollectionError} from "src/errors/Error.sol";
 
 library SeparateCollection {
     bytes32 private constant _REVEAL_STORAGE = keccak256("src.objects.SeparateCollectionReveal.storage.v1");
@@ -24,7 +25,7 @@ library SeparateCollection {
     function createRevealedNFT(string memory name_, string memory symbol_, address owner_) internal {
         RevealStorage storage data = read();
         if (address(data.revealedNFT) != address(0)) {
-            revert("Reveal: Already created");
+            revert CollectionError.CollectionAlreadyCreated(address(data.revealedNFT));
         }
 
         address impl = address(new RevealedNFT());
@@ -41,7 +42,7 @@ library SeparateCollection {
     function mint(address to_, uint256 tokenId_, uint256 metadata_) internal {
         RevealStorage storage data = read();
         if (address(data.revealedNFT) == address(0)) {
-            revert("mint: Not created");
+            revert CollectionError.CollectionNotCreated();
         }
         data.revealedNFT.mint(to_, tokenId_, metadata_);
     }

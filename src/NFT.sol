@@ -18,6 +18,7 @@ import {RevealType} from "src/types/GlobalEnum.sol";
 import {Metadata} from "src/objects/Metadata.sol";
 import {SeparateCollection} from "src/objects/SeparateCollection.sol";
 import {RevealStatus} from "src/types/GlobalEnum.sol";
+import {ConfigError, CollectionError} from "src/errors/Error.sol";
 
 contract NFT is
     UUPSUpgradeable,
@@ -70,10 +71,10 @@ contract NFT is
         // 0. Check if mint possible
         {
             if (!Config.isMintStarted()) {
-                revert("mint: Minting has not started yet");
+                revert ConfigError.MintingHasNotStarted();
             }
             if (Config.isRevealStarted()) {
-                revert("mint: Reveal has already started");
+                revert ConfigError.RevealAlreadyStarted();
             }
         }
 
@@ -81,7 +82,7 @@ contract NFT is
         {
             uint256 mintingPrice = Config.mintPrice();
             if (msg.value < mintingPrice) {
-                revert("mint: Insufficient payment");
+                revert ConfigError.InsufficientPayment(mintingPrice, msg.value);
             }
             if (msg.value > mintingPrice) {
                 Call.pay(msg.sender, msg.value - mintingPrice);
@@ -102,7 +103,7 @@ contract NFT is
         // 0. Check if reveal possible
         {
             if (!Config.isRevealStarted()) {
-                revert("reveal: Reveal has not started yet");
+                revert ConfigError.RevealHasNotStarted();
             }
         }
 
@@ -127,7 +128,7 @@ contract NFT is
      */
     function createRevealedNFT() external onlyOwner returns (address) {
         if (Config.revealType() != RevealType.SeparateCollection) {
-            revert("createRevealedNFT: Only available in SeparateCollection config");
+            revert ConfigError.OnlySeparateCollectionType();
         }
         SeparateCollection.createRevealedNFT(name(), symbol(), owner());
         return address(SeparateCollection.getRevealedNFT());
@@ -232,11 +233,12 @@ contract NFT is
         // 3. If the reveal type is SeparateCollection, mint the revealed NFT
         if (revealType == RevealType.SeparateCollection) {
             SeparateCollection.mint(to, tokenId, randomWords_[0]);
+            _burn(tokenId);
             return;
         }
 
         // 4. If the reveal type is not supported, revert
-        revert("fulfillRandomWords: Invalid reveal type");
+        revert CollectionError.InvalidCollectionType(revealType);
     }
 
     /**

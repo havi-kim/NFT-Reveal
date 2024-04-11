@@ -43,7 +43,7 @@ contract RevealedNFTUnitTest is Test {
 
         // Act
         vm.broadcast(address(0x3)); // Set msg.sender to a different address
-        vm.expectRevert("RevealedNFT: Only parent NFT contract can call");
+        vm.expectRevert(abi.encodeWithSelector(RevealedNFTError.OnlyParentNFT.selector, address(this), address(0x3)));
         revealedNFT.mint(to, tokenId, metadata);
     }
 }
