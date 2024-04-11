@@ -4,16 +4,16 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import {VRFCoordinatorV2Interface} from "@chainlink/interfaces/vrf/VRFCoordinatorV2Interface.sol";
 
-import "src/NFT.sol";
+import "src/PurchasableNFT.sol";
 import "src/RevealedNFT.sol";
 
 contract NFTUnitTest is Test {
-    NFT private testTarget;
+    PurchasableNFT private testTarget;
     address private mockCoordinator = address(0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625);
     uint96 private mintPrice = 0.1 ether;
 
     function setUp() public {
-        testTarget = new NFT();
+        testTarget = new PurchasableNFT();
         testTarget.initialize(
             "TEST_NAME",
             "TEST_SYMBOL",

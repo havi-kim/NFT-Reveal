@@ -3,15 +3,15 @@ pragma solidity >=0.8.11 <0.9.0;
 
 import "forge-std/Script.sol";
 
-import {RevealType} from "../../src/types/GlobalEnum.sol";
-import {RevealedNFT} from "../../src/RevealedNFT.sol";
-import {NFT} from "../../src/NFT.sol";
+import {RevealType} from "src/types/GlobalEnum.sol";
+import {RevealedNFT} from "src/RevealedNFT.sol";
+import {PurchasableNFT} from "src/PurchasableNFT.sol";
 
 contract ScriptHelper is Script {
     struct NetworkConfig {
         address account;
         uint256 pk;
-        NFT nft;
+        PurchasableNFT nft;
         RevealedNFT revealedNft;
         address coordinator;
         string nftName;
@@ -35,7 +35,7 @@ contract ScriptHelper is Script {
 
         config.account = vm.parseJsonAddress(json, ".00_ACCOUNT");
         config.pk = vm.parseJsonUint(json, ".01_PK");
-        config.nft = NFT(vm.parseJsonAddress(json, ".02_NFT"));
+        config.nft = PurchasableNFT(vm.parseJsonAddress(json, ".02_NFT"));
         config.revealedNft = RevealedNFT(vm.parseJsonAddress(json, ".03_REVEALED_NFT"));
         config.coordinator = vm.parseJsonAddress(json, ".04_VRF_COORDINATOR");
         config.nftName = vm.parseJsonString(json, ".05_NFT_NAME");

@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import {VRFCoordinatorV2Interface} from "@chainlink/interfaces/vrf/VRFCoordinatorV2Interface.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-import "src/NFT.sol";
+import "src/PurchasableNFT.sol";
 import "src/RevealedNFT.sol";
 
 // This is a integration test. If dependencies are needed, use `forge test -f rpc` to run the test.
@@ -34,12 +34,12 @@ contract NFTIntegrationTest is Test {
     // @success_test
     function test_case_user_sequence_InCollection() external {
         // Deploy contract
-        address impl = address(new NFT());
+        address impl = address(new PurchasableNFT());
 
         // Initialize NFT contract
         vm.broadcast(owner);
         bytes memory initData = abi.encodeWithSelector(
-            NFT.initialize.selector,
+            PurchasableNFT.initialize.selector,
             "TEST_NAME",
             "TEST_SYMBOL",
             mockCoordinator,
@@ -48,7 +48,7 @@ contract NFTIntegrationTest is Test {
             RevealType.InCollection,
             uint48(block.number + 100)
         );
-        NFT nftContract = NFT(address(new ERC1967Proxy(impl, initData)));
+        PurchasableNFT nftContract = PurchasableNFT(address(new ERC1967Proxy(impl, initData)));
 
         if (isForked) {
             vm.broadcast(0x58311Bf48BCfDF069cA28ed46f7953837175BAB4);
@@ -101,12 +101,12 @@ contract NFTIntegrationTest is Test {
     // @success_test
     function test_case_user_sequence_SeparateCollection() external {
         // Deploy contract
-        address impl = address(new NFT());
+        address impl = address(new PurchasableNFT());
 
         // Initialize NFT contract
         vm.broadcast(owner);
         bytes memory initData = abi.encodeWithSelector(
-            NFT.initialize.selector,
+            PurchasableNFT.initialize.selector,
             "TEST_NAME",
             "TEST_SYMBOL",
             mockCoordinator,
@@ -115,7 +115,7 @@ contract NFTIntegrationTest is Test {
             RevealType.SeparateCollection,
             uint48(block.number + 100)
         );
-        NFT nftContract = NFT(address(new ERC1967Proxy(impl, initData)));
+        PurchasableNFT nftContract = PurchasableNFT(address(new ERC1967Proxy(impl, initData)));
 
         if (isForked) {
             vm.broadcast(0x58311Bf48BCfDF069cA28ed46f7953837175BAB4);
@@ -168,13 +168,13 @@ contract NFTIntegrationTest is Test {
 
     // @sucess_test
     function test_upgrade() external {
-        address nftImpl = address(new NFT());
+        address nftImpl = address(new PurchasableNFT());
         address revealedNFTImpl = address(new RevealedNFT());
 
         // Initialize NFT contract
         vm.broadcast(owner);
         bytes memory initData = abi.encodeWithSelector(
-            NFT.initialize.selector,
+            PurchasableNFT.initialize.selector,
             "TEST_NAME",
             "TEST_SYMBOL",
             mockCoordinator,
@@ -184,7 +184,7 @@ contract NFTIntegrationTest is Test {
             uint48(block.number + 100)
         );
 
-        NFT nftContract = NFT(address(new ERC1967Proxy(nftImpl, initData)));
+        PurchasableNFT nftContract = PurchasableNFT(address(new ERC1967Proxy(nftImpl, initData)));
         vm.broadcast(owner);
         nftContract.createRevealedNFT();
         RevealedNFT revealedNFT = RevealedNFT(nftContract.revealedNFT());
@@ -200,7 +200,7 @@ contract NFTIntegrationTest is Test {
         vm.broadcast(owner);
         revealedNFT.upgradeToAndCall(nftImpl, "");
         // If upgrade is not successful, this should revert
-        NFT(address(revealedNFT)).revealedNFT();
+        PurchasableNFT(address(revealedNFT)).revealedNFT();
     }
 }
 

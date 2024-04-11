@@ -26,7 +26,7 @@ import {ConfigError, CollectionError} from "src/errors/Error.sol";
  *      First, the reveal can be done in the same contract. When reveal, only the metadata is set.
  *      Second, the reveal can be done in a separate contract. When reveal, the revealed NFT is minted with metadata and the original NFT is burned.
  */
-contract NFT is
+contract PurchasableNFT is
     UUPSUpgradeable,
     ERC721Upgradeable,
     OwnableUpgradeable,

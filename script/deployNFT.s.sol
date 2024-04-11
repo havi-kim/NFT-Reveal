@@ -26,12 +26,12 @@ contract deployNFT is ScriptHelper {
 
         // 4. Deploy NFT contract
         console.log("Deploy NFT contract");
-        address impl = address(new NFT());
+        address impl = address(new PurchasableNFT());
 
         // 5. Initialize NFT contract
         console.log("Initialize NFT contract");
         bytes memory initData = abi.encodeWithSelector(
-            NFT.initialize.selector,
+            PurchasableNFT.initialize.selector,
             networkConfig.nftName,
             networkConfig.nftSymbol,
             networkConfig.coordinator,
@@ -40,7 +40,7 @@ contract deployNFT is ScriptHelper {
             networkConfig.revealType,
             networkConfig.revealStartBlock
         );
-        networkConfig.nft = NFT(address(new ERC1967Proxy(impl, initData)));
+        networkConfig.nft = PurchasableNFT(address(new ERC1967Proxy(impl, initData)));
 
         // 6. Stop broadcast
         vm.stopBroadcast();

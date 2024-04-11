@@ -5,7 +5,7 @@ import {ERC1967Proxy} from "@openzeppelin-contracts/proxy/ERC1967/ERC1967Proxy.s
 
 import {Config} from "src/objects/Config.sol";
 import {RevealType} from "src/types/GlobalEnum.sol";
-import {NFT} from "src/NFT.sol";
+import {PurchasableNFT} from "src/PurchasableNFT.sol";
 import {RevealedNFT, IRevealedNFT} from "src/RevealedNFT.sol";
 import {CollectionError} from "src/errors/Error.sol";
 
